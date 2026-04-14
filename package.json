@@ -1,0 +1,29 @@
+{
+  "name": "tech_store_backend",
+  "version": "1.0.0",
+  "description": "Backend for Tech Store application",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "seed": "node src/prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node src/prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.7.0",
+    "@prisma/adapter-mariadb": "^7.7.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prisma": "^7.7.0"
+  }
+}

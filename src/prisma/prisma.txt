@@ -1,0 +1,44 @@
+📊 22 Models:
+- Sản phẩm: Category, Brand, Product, ProductVariant, ProductImage ✨ (NEW)
+- Specs: SpecGroup, SpecDefinition, VariantSpecValue, CategorySpecDefinition
+- Kho: Warehouse, InventoryBatch, InventoryItem, InventoryIdentifier
+- Đơn hàng: Order, OrderItem, Payment, Shipping
+- Bảo hành: Warranty, WarrantyClaim
+- Người dùng: User, Customer, ActivityLog
+- Đánh giá: Review ✨ (NEW)
+- Giảm giá: Coupon, OrderDiscount ✨ (NEW)
+- Tìm kiếm: VariantSearchIndex
+
+Category: Lưu danh mục sản phẩm, dùng để phân loại và hiển thị theo nhóm.
+Brand: Lưu thương hiệu, dùng để gắn sản phẩm theo nhãn hiệu.
+Product: Lưu thông tin chung của sản phẩm mẹ, như tên, mô tả, brand, category.
+ProductVariant: Lưu biến thể sản phẩm cụ thể (SKU, màu, giá, trạng thái).
+ProductImage: Lưu ảnh của từng biến thể sản phẩm để hiển thị gallery.
+
+SpecGroup: Nhóm các thông số kỹ thuật, giúp tổ chức spec theo nhóm.
+SpecDefinition: Định nghĩa từng thông số kỹ thuật (RAM, màn hình, pin, ...).
+CategorySpecDefinition: Gắn spec cho category, xác định spec nào áp dụng cho danh mục.
+VariantSpecValue: Lưu giá trị spec cho mỗi biến thể sản phẩm.
+
+Warehouse: Lưu thông tin kho hàng.
+InventoryBatch: Lưu thông tin lô hàng nhập về.
+InventoryItem: Lưu từng mặt hàng tồn kho cụ thể, theo biến thể và kho.
+InventoryIdentifier: Lưu mã định danh độc nhất của item (serial, IMEI, barcode).
+
+Customer: Lưu thông tin khách hàng.
+Order: Lưu thông tin đơn hàng, trạng thái, tổng tiền và khách hàng.
+OrderItem: Lưu từng dòng hàng trong đơn, liên kết variant và item kho.
+Payment: Lưu giao dịch thanh toán của đơn hàng.
+Shipping: Lưu thông tin vận chuyển, địa chỉ, mã tracking, trạng thái.
+
+Warranty: Lưu thông tin bảo hành cho từng item.
+WarrantyClaim: Lưu thông tin khiếu nại bảo hành.
+
+User: Lưu tài khoản hệ thống (admin/warehouse_staff/customer).
+ActivityLog: Lưu lịch sử hành động của người dùng.
+
+Review: Lưu đánh giá và xếp hạng sản phẩm theo variant.
+Coupon: Lưu mã giảm giá, điều kiện và hạn sử dụng.
+OrderDiscount: Lưu chi tiết giảm giá áp dụng cho đơn hàng.
+
+VariantSearchIndex: Lưu chỉ mục tìm kiếm, phục vụ lọc/so sánh nhanh.
