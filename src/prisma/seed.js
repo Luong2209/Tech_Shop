@@ -214,6 +214,39 @@ const categorySpecMap = {
   ],
 };
 
+const specTemplates = [
+  {
+    categorySlug: "dien-thoai",
+    name: "Phone default spec template",
+    slug: "phone-default-spec-template",
+    description: "Default technical specs for phone products.",
+    specsJson: {
+      fields: categorySpecMap["dien-thoai"],
+      requiredFields: categorySpecMap["dien-thoai"].slice(0, 5),
+    },
+  },
+  {
+    categorySlug: "laptop",
+    name: "Laptop default spec template",
+    slug: "laptop-default-spec-template",
+    description: "Default technical specs for laptop products.",
+    specsJson: {
+      fields: categorySpecMap.laptop,
+      requiredFields: categorySpecMap.laptop.slice(0, 5),
+    },
+  },
+  {
+    categorySlug: "tablet",
+    name: "Tablet default spec template",
+    slug: "tablet-default-spec-template",
+    description: "Default technical specs for tablet products.",
+    specsJson: {
+      fields: categorySpecMap.tablet,
+      requiredFields: categorySpecMap.tablet.slice(0, 5),
+    },
+  },
+];
+
 const coupons = [
   {
     code: "WELCOME10",
@@ -234,6 +267,95 @@ const coupons = [
     startDate: new Date("2026-01-01T00:00:00.000Z"),
     endDate: new Date("2026-12-31T23:59:59.000Z"),
     description: "Giảm trực tiếp 50.000 VND cho đơn từ 1 triệu.",
+  },
+];
+
+const sampleProducts = [
+  {
+    categorySlug: "dien-thoai",
+    brandSlug: "apple",
+    name: "iPhone 15",
+    slug: "iphone-15",
+    specTemplateSlug: "phone-default-spec-template",
+    technicalSpecsJson: {
+      screen_size: "6.1 inch",
+      screen_technology: "Super Retina XDR",
+      chipset: "Apple A16 Bionic",
+      ram: "6GB",
+      storage: "128GB",
+      battery_capacity: "3349 mAh",
+    },
+    shortDescription: "Apple iPhone 15 with Dynamic Island and USB-C.",
+    description: "Sample smartphone product for API testing.",
+    warrantyMonths: 12,
+    status: "ACTIVE",
+    variants: [
+      {
+        sku: "IP15-128-BLK",
+        name: "iPhone 15 128GB Black",
+        slug: "iphone-15-128gb-black",
+        color: "Black",
+        storageLabel: "128GB",
+        ramLabel: "6GB",
+        price: "19990000",
+        compareAtPrice: "22990000",
+        isDefault: true,
+        specs: {
+          screen_size: { valueText: "6.1 inch", displayValue: "6.1 inch" },
+          screen_technology: { valueText: "Super Retina XDR", displayValue: "Super Retina XDR" },
+          chipset: { valueText: "Apple A16 Bionic", displayValue: "Apple A16 Bionic" },
+          ram: { valueText: "6GB", displayValue: "6GB" },
+          storage: { valueText: "128GB", displayValue: "128GB" },
+          battery_capacity: { valueNumber: "3349", displayValue: "3349 mAh" },
+        },
+        stock: [
+          { type: "IMEI", value: "SEED-IP15-IMEI-0001", purchasePrice: "17000000" },
+          { type: "IMEI", value: "SEED-IP15-IMEI-0002", purchasePrice: "17000000" },
+        ],
+      },
+    ],
+  },
+  {
+    categorySlug: "laptop",
+    brandSlug: "asus",
+    name: "Asus Vivobook 15",
+    slug: "asus-vivobook-15",
+    specTemplateSlug: "laptop-default-spec-template",
+    technicalSpecsJson: {
+      screen_size: "15.6 inch",
+      chipset: "Intel Core i5",
+      ram: "16GB",
+      storage: "512GB SSD",
+      weight: "1.7 kg",
+    },
+    shortDescription: "Everyday laptop for study and office work.",
+    description: "Sample laptop product for inventory and order testing.",
+    warrantyMonths: 24,
+    status: "ACTIVE",
+    variants: [
+      {
+        sku: "ASUS-VB15-I5-512",
+        name: "Asus Vivobook 15 i5 512GB",
+        slug: "asus-vivobook-15-i5-512gb",
+        color: "Silver",
+        storageLabel: "512GB SSD",
+        ramLabel: "16GB",
+        price: "14990000",
+        compareAtPrice: "16990000",
+        isDefault: true,
+        specs: {
+          screen_size: { valueText: "15.6 inch", displayValue: "15.6 inch" },
+          chipset: { valueText: "Intel Core i5", displayValue: "Intel Core i5" },
+          ram: { valueText: "16GB", displayValue: "16GB" },
+          storage: { valueText: "512GB SSD", displayValue: "512GB SSD" },
+          weight: { valueNumber: "1700", displayValue: "1.7 kg" },
+        },
+        stock: [
+          { type: "SERIAL", value: "SEED-ASUS-VB15-SN-0001", purchasePrice: "12000000" },
+          { type: "SERIAL", value: "SEED-ASUS-VB15-SN-0002", purchasePrice: "12000000" },
+        ],
+      },
+    ],
   },
 ];
 
@@ -396,6 +518,36 @@ async function seedCategorySpecDefinitions() {
   }
 }
 
+async function seedSpecTemplates() {
+  const dbCategories = await prisma.category.findMany();
+  const categoryMap = new Map(dbCategories.map((category) => [category.slug, category.id]));
+
+  for (const template of specTemplates) {
+    const categoryId = categoryMap.get(template.categorySlug);
+
+    if (!categoryId) {
+      continue;
+    }
+
+    await prisma.specTemplate.upsert({
+      where: { slug: template.slug },
+      update: {
+        categoryId,
+        name: template.name,
+        description: template.description,
+        specsJson: template.specsJson,
+      },
+      create: {
+        categoryId,
+        name: template.name,
+        slug: template.slug,
+        description: template.description,
+        specsJson: template.specsJson,
+      },
+    });
+  }
+}
+
 async function seedCoupons() {
   for (const coupon of coupons) {
     await prisma.coupon.upsert({
@@ -418,6 +570,167 @@ async function seedCoupons() {
   }
 }
 
+async function seedSampleProductsAndInventory() {
+  const [dbCategories, dbBrands, dbSpecs, dbSpecTemplates, warehouse] = await Promise.all([
+    prisma.category.findMany(),
+    prisma.brand.findMany(),
+    prisma.specDefinition.findMany(),
+    prisma.specTemplate.findMany(),
+    prisma.warehouse.findFirst({
+      where: { code: "WH-HCM-01" },
+    }),
+  ]);
+
+  const categoryMap = new Map(dbCategories.map((category) => [category.slug, category.id]));
+  const brandMap = new Map(dbBrands.map((brand) => [brand.slug, brand.id]));
+  const specMap = new Map(dbSpecs.map((spec) => [spec.code, spec.id]));
+  const specTemplateMap = new Map(
+    dbSpecTemplates.map((template) => [template.slug, template.id])
+  );
+
+  if (!warehouse) {
+    throw new Error("Default warehouse WH-HCM-01 was not found");
+  }
+
+  const batch = await prisma.inventoryBatch.upsert({
+    where: { batchCode: "SEED-INITIAL-STOCK" },
+    update: {
+      supplierName: "Seed Supplier",
+      note: "Initial sample stock for API testing",
+    },
+    create: {
+      batchCode: "SEED-INITIAL-STOCK",
+      supplierName: "Seed Supplier",
+      note: "Initial sample stock for API testing",
+    },
+  });
+
+  for (const sampleProduct of sampleProducts) {
+    const categoryId = categoryMap.get(sampleProduct.categorySlug);
+    const brandId = brandMap.get(sampleProduct.brandSlug);
+    const specTemplateId = specTemplateMap.get(sampleProduct.specTemplateSlug);
+
+    if (!categoryId || !brandId || !specTemplateId) {
+      continue;
+    }
+
+    const product = await prisma.product.upsert({
+      where: { slug: sampleProduct.slug },
+      update: {
+        categoryId,
+        brandId,
+        specTemplateId,
+        name: sampleProduct.name,
+        shortDescription: sampleProduct.shortDescription,
+        description: sampleProduct.description,
+        technicalSpecsJson: sampleProduct.technicalSpecsJson,
+        warrantyMonths: sampleProduct.warrantyMonths,
+        status: sampleProduct.status,
+      },
+      create: {
+        categoryId,
+        brandId,
+        specTemplateId,
+        name: sampleProduct.name,
+        slug: sampleProduct.slug,
+        shortDescription: sampleProduct.shortDescription,
+        description: sampleProduct.description,
+        technicalSpecsJson: sampleProduct.technicalSpecsJson,
+        warrantyMonths: sampleProduct.warrantyMonths,
+        status: sampleProduct.status,
+      },
+    });
+
+    for (const sampleVariant of sampleProduct.variants) {
+      const variant = await prisma.productVariant.upsert({
+        where: { sku: sampleVariant.sku },
+        update: {
+          productId: product.id,
+          name: sampleVariant.name,
+          slug: sampleVariant.slug,
+          color: sampleVariant.color,
+          storageLabel: sampleVariant.storageLabel,
+          ramLabel: sampleVariant.ramLabel,
+          price: sampleVariant.price,
+          compareAtPrice: sampleVariant.compareAtPrice,
+          isDefault: sampleVariant.isDefault,
+          status: "ACTIVE",
+        },
+        create: {
+          productId: product.id,
+          sku: sampleVariant.sku,
+          name: sampleVariant.name,
+          slug: sampleVariant.slug,
+          color: sampleVariant.color,
+          storageLabel: sampleVariant.storageLabel,
+          ramLabel: sampleVariant.ramLabel,
+          price: sampleVariant.price,
+          compareAtPrice: sampleVariant.compareAtPrice,
+          isDefault: sampleVariant.isDefault,
+          status: "ACTIVE",
+        },
+      });
+
+      for (const [specCode, specValue] of Object.entries(sampleVariant.specs)) {
+        const specDefinitionId = specMap.get(specCode);
+
+        if (!specDefinitionId) {
+          continue;
+        }
+
+        await prisma.variantSpecValue.upsert({
+          where: {
+            productVariantId_specDefinitionId: {
+              productVariantId: variant.id,
+              specDefinitionId,
+            },
+          },
+          update: {
+            valueText: specValue.valueText ?? null,
+            valueNumber: specValue.valueNumber ?? null,
+            valueBoolean: specValue.valueBoolean ?? null,
+            displayValue: specValue.displayValue ?? null,
+          },
+          create: {
+            productVariantId: variant.id,
+            specDefinitionId,
+            valueText: specValue.valueText ?? null,
+            valueNumber: specValue.valueNumber ?? null,
+            valueBoolean: specValue.valueBoolean ?? null,
+            displayValue: specValue.displayValue ?? null,
+          },
+        });
+      }
+
+      for (const stockItem of sampleVariant.stock) {
+        const existingIdentifier = await prisma.inventoryIdentifier.findUnique({
+          where: { value: stockItem.value },
+        });
+
+        if (existingIdentifier) {
+          continue;
+        }
+
+        await prisma.inventoryItem.create({
+          data: {
+            productVariantId: variant.id,
+            warehouseId: warehouse.id,
+            batchId: batch.id,
+            status: "IN_STOCK",
+            purchasePrice: stockItem.purchasePrice,
+            identifiers: {
+              create: {
+                type: stockItem.type,
+                value: stockItem.value,
+              },
+            },
+          },
+        });
+      }
+    }
+  }
+}
+
 async function main() {
   await seedUsers();
   await seedCustomers();
@@ -427,9 +740,23 @@ async function main() {
   await seedSpecGroups();
   await seedSpecDefinitions();
   await seedCategorySpecDefinitions();
+  await seedSpecTemplates();
   await seedCoupons();
+  await seedSampleProductsAndInventory();
 
-  const [userCount, customerCount, brandCount, categoryCount, warehouseCount, specGroupCount, specDefinitionCount, couponCount] =
+  const [
+    userCount,
+    customerCount,
+    brandCount,
+    categoryCount,
+    warehouseCount,
+    specGroupCount,
+    specDefinitionCount,
+    specTemplateCount,
+    couponCount,
+    productCount,
+    inventoryItemCount,
+  ] =
     await Promise.all([
       prisma.user.count(),
       prisma.customer.count(),
@@ -438,7 +765,10 @@ async function main() {
       prisma.warehouse.count(),
       prisma.specGroup.count(),
       prisma.specDefinition.count(),
+      prisma.specTemplate.count(),
       prisma.coupon.count(),
+      prisma.product.count(),
+      prisma.inventoryItem.count(),
     ]);
 
   console.log("Seed completed.");
@@ -450,7 +780,10 @@ async function main() {
     warehouses: warehouseCount,
     specGroups: specGroupCount,
     specDefinitions: specDefinitionCount,
+    specTemplates: specTemplateCount,
     coupons: couponCount,
+    products: productCount,
+    inventoryItems: inventoryItemCount,
   });
 }
 

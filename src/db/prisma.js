@@ -1,11 +1,11 @@
-require('dotenv/config');
+require("dotenv/config");
 
-const { PrismaClient } = require('@prisma/client');
-const { PrismaMariaDb } = require('@prisma/adapter-mariadb');
+const { PrismaClient } = require("@prisma/client");
+const { PrismaMariaDb } = require("@prisma/adapter-mariadb");
 
 function createAdapterFromDatabaseUrl(databaseUrl) {
   if (!databaseUrl) {
-    throw new Error('DATABASE_URL is not defined');
+    throw new Error("DATABASE_URL is not defined");
   }
 
   const parsedUrl = new URL(databaseUrl);
@@ -19,7 +19,16 @@ function createAdapterFromDatabaseUrl(databaseUrl) {
   });
 }
 
-const adapter = createAdapterFromDatabaseUrl(process.env.DATABASE_URL);
-const prisma = new PrismaClient({ adapter });
+const globalForPrisma = globalThis;
+
+const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    adapter: createAdapterFromDatabaseUrl(process.env.DATABASE_URL),
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
 
 module.exports = prisma;
