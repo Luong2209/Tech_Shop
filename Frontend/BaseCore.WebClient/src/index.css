@@ -1,0 +1,519 @@
+@import "tailwindcss";
+
+@theme {
+  /* ============================================================
+   * TechStore Design System — Luxury / Refined, light-first
+   * Cam (warm orange) + Đỏ (deep red) primary
+   * White → warm cream background with subtle orange tint
+   * ============================================================ */
+
+  /* Brand */
+  --color-primary: #C0392B;
+  --color-primary-hover: #A93226;
+  --color-primary-soft: rgba(192, 57, 43, 0.12);
+
+  --color-accent: #E67E22;
+  --color-accent-hover: #D35400;
+  --color-accent-soft: rgba(230, 126, 34, 0.14);
+
+  --color-gold: #B8924A;
+  --color-gold-soft: rgba(184, 146, 74, 0.16);
+
+  /* Surfaces — warm-white luxury */
+  --color-background: #FBF7F1;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F7F1E7;
+  --color-surface-3: #EFE6D6;
+
+  /* Lines */
+  --color-border: #E8DCC8;
+  --color-border-strong: #D2C2A8;
+
+  /* Type — high contrast for readability */
+  --color-fg: #1F1A14;
+  --color-fg-muted: #4A4138;
+  --color-fg-dim: #7A6F62;
+  --color-fg-faint: #ADA39A;
+
+  /* Status */
+  --color-success: #2D9A5F;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+  --color-info: #2563EB;
+
+  /* Font families */
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Radius (refined, never playful) */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Shadows — soft warm tone */
+  --shadow-soft: 0 1px 2px rgba(31, 26, 20, 0.04), 0 8px 24px -12px rgba(192, 57, 43, 0.08);
+  --shadow-card: 0 1px 3px rgba(31, 26, 20, 0.06), 0 12px 32px -16px rgba(230, 126, 34, 0.12);
+  --shadow-lift: 0 4px 12px rgba(31, 26, 20, 0.08), 0 24px 48px -16px rgba(192, 57, 43, 0.18);
+  --shadow-glow-primary: 0 0 0 1px rgba(192, 57, 43, 0.25), 0 12px 32px -8px rgba(192, 57, 43, 0.35);
+  --shadow-glow-accent: 0 0 0 1px rgba(230, 126, 34, 0.25), 0 12px 32px -8px rgba(230, 126, 34, 0.35);
+}
+
+/* ------------------------------------------------------------------
+ * Base reset / globals
+ * ------------------------------------------------------------------ */
+@layer base {
+  html {
+    background: var(--color-background);
+    color: var(--color-fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-fg);
+    min-height: 100vh;
+    font-feature-settings: "ss01", "cv11";
+    position: relative;
+
+    /* Soft warm gradient: cream → white → orange tint */
+    background:
+      radial-gradient(1200px 600px at 100% -10%, rgba(230, 126, 34, 0.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(192, 57, 43, 0.06), transparent 60%),
+      linear-gradient(180deg, #FFFFFF 0%, var(--color-background) 100%);
+    background-attachment: fixed;
+  }
+
+  /* Subtle paper-grain noise overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.045;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    color: var(--color-fg);
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: #FFFFFF;
+  }
+
+  /* Custom scrollbar (warm light) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 999px;
+    border: 2px solid var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+  }
+
+  /* Default focus ring */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  input, select, textarea {
+    font-family: inherit;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Reusable component primitives (use sparingly — prefer utilities)
+ * ------------------------------------------------------------------ */
+@layer components {
+  .ts-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .ts-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum";
+  }
+
+  /* Gradient text — primary → accent */
+  .ts-gradient-text {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Hairline divider (refined) */
+  .ts-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 20%,
+      var(--color-border) 80%,
+      transparent 100%
+    );
+  }
+
+  /* Buttons */
+  .ts-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.25rem;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 220ms cubic-bezier(0.4, 0, 0.2, 1),
+                background 220ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 220ms cubic-bezier(0.4, 0, 0.2, 1),
+                color 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .ts-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  /* Sheen overlay on hover */
+  .ts-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.25) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 600ms ease;
+    pointer-events: none;
+  }
+  .ts-btn:hover:not(:disabled)::after {
+    transform: translateX(120%);
+  }
+
+  .ts-btn-primary {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.25);
+  }
+  .ts-btn-primary:hover:not(:disabled) {
+    box-shadow: var(--shadow-glow-primary);
+    transform: translateY(-1px);
+  }
+  .ts-btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .ts-btn-ghost {
+    background: var(--color-surface);
+    color: var(--color-fg);
+    border-color: var(--color-border);
+  }
+  .ts-btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: 0 4px 16px -4px rgba(192, 57, 43, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .ts-btn-outline {
+    background: transparent;
+    color: var(--color-fg-muted);
+    border-color: var(--color-border);
+  }
+  .ts-btn-outline:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-fg);
+    background: var(--color-accent-soft);
+    transform: translateY(-1px);
+  }
+
+  /* Input fields */
+  .ts-input {
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg);
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+    transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+  }
+  .ts-input::placeholder {
+    color: var(--color-fg-faint);
+  }
+  .ts-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+    background: #FFFFFF;
+  }
+  .ts-input:hover:not(:focus):not(:disabled) {
+    border-color: var(--color-border-strong);
+  }
+
+  /* Cards */
+  .ts-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    transition: border-color 280ms ease, transform 280ms ease, box-shadow 280ms ease;
+  }
+  .ts-card-hover:hover {
+    border-color: var(--color-border-strong);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* Pill / badge */
+  .ts-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-fg-muted);
+  }
+
+  /* Section labels (small caps) */
+  .ts-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-fg-dim);
+  }
+
+  /* Container helper */
+  .ts-container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    max-width: 1280px;
+  }
+  @media (min-width: 768px) {
+    .ts-container { padding-inline: 2rem; }
+  }
+  @media (min-width: 1280px) {
+    .ts-container { padding-inline: 3rem; }
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Animations
+ * ------------------------------------------------------------------ */
+@keyframes ts-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ts-fade-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ts-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ts-scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes ts-slide-right {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes ts-slide-left {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes ts-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(0.5deg); }
+}
+@keyframes ts-float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes ts-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.35); }
+  50%      { box-shadow: 0 0 0 14px rgba(192, 57, 43, 0); }
+}
+@keyframes ts-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes ts-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes ts-blob {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50%      { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+@keyframes ts-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Utility classes for animations */
+.ts-anim-fade-up    { animation: ts-fade-up 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.ts-anim-fade-down  { animation: ts-fade-down 500ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.ts-anim-fade-in    { animation: ts-fade-in 600ms ease both; }
+.ts-anim-scale-in   { animation: ts-scale-in 480ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.ts-anim-slide-right{ animation: ts-slide-right 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.ts-anim-slide-left { animation: ts-slide-left 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.ts-anim-float      { animation: ts-float 6s ease-in-out infinite; }
+.ts-anim-float-slow { animation: ts-float-slow 8s ease-in-out infinite; }
+.ts-anim-pulse      { animation: ts-pulse-glow 2.2s ease-out infinite; }
+.ts-anim-rotate     { animation: ts-rotate 12s linear infinite; }
+.ts-anim-blob       { animation: ts-blob 14s ease-in-out infinite; }
+
+/* Stagger helpers — apply to children of a container */
+.ts-stagger > *      { animation: ts-fade-up 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.ts-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.ts-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.ts-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.ts-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.ts-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.ts-stagger > *:nth-child(6) { animation-delay: 400ms; }
+.ts-stagger > *:nth-child(7) { animation-delay: 480ms; }
+.ts-stagger > *:nth-child(8) { animation-delay: 560ms; }
+.ts-stagger > *:nth-child(n + 9) { animation-delay: 640ms; }
+
+/* Shimmer skeleton */
+.ts-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface-3) 50%,
+    var(--color-surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: ts-shimmer 1.6s ease-in-out infinite;
+}
+
+/* Hover lift utility */
+.ts-hover-lift {
+  transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              box-shadow 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ts-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* Underline draw on hover */
+.ts-link-underline {
+  position: relative;
+  display: inline-block;
+}
+.ts-link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ts-link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Reveal-on-view (uses IntersectionObserver-friendly setup) */
+.ts-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ts-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .ts-anim-fade-up, .ts-anim-fade-down, .ts-anim-fade-in, .ts-anim-scale-in,
+  .ts-anim-slide-right, .ts-anim-slide-left, .ts-anim-float, .ts-anim-float-slow,
+  .ts-anim-pulse, .ts-anim-rotate, .ts-anim-blob, .ts-stagger > *, .ts-shimmer,
+  .ts-reveal {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Swiper overrides (light luxury)
+ * ------------------------------------------------------------------ */
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--color-fg) !important;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  transition: all 220ms ease;
+}
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary) !important;
+  transform: scale(1.08);
+}
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+.swiper-pagination-bullet {
+  background: var(--color-border-strong) !important;
+  opacity: 1 !important;
+  transition: width 280ms ease, background 280ms ease;
+}
+.swiper-pagination-bullet-active {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-primary)) !important;
+  width: 28px;
+  border-radius: 999px;
+}
